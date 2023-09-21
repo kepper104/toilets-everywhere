@@ -21,9 +21,10 @@ fun WelcomeScreen() {
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
+
         Log.d(Tags.CompositionLogger.toString(), "Composing welcome!")
         Text(
-            text = "Welcome to Toilets Here and There!",
+            text = "Welcome to Toilets Everywhere!",
         )
         Text(
             text = "Select any of the options below:"

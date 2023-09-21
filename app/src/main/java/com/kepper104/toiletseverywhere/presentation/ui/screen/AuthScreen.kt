@@ -65,7 +65,7 @@ fun AuthScreenMain(navigator: DestinationsNavigator, vm: MainViewModel) {
                 textAlign = TextAlign.Center,
             )
             Text(
-                text = "Toilets Here and There!",
+                text = "Toilets Everywhere!",
                 modifier = Modifier.padding(bottom = 30.dp),
                 fontSize = 30.sp,
                 textAlign = TextAlign.Center,
