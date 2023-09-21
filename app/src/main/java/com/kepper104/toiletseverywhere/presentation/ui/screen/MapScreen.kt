@@ -1,8 +1,11 @@
 package com.kepper104.toiletseverywhere.presentation.ui.screen
 
+import android.content.Context
+import android.location.LocationRequest
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.result.IntentSenderRequest
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -25,6 +28,7 @@ import com.kepper104.toiletseverywhere.data.Tags
 import com.kepper104.toiletseverywhere.presentation.MainViewModel
 import com.kepper104.toiletseverywhere.presentation.ui.state.CurrentDetailsScreen
 import com.ramcosta.composedestinations.annotation.Destination
+
 
 @Destination
 @Composable
@@ -59,7 +63,8 @@ fun MapScreen(
                 .fillMaxSize(),
             properties = mainViewModel.mapState.properties,
             uiSettings = mapUiSettings,
-            cameraPositionState = cameraPositionState
+            cameraPositionState = cameraPositionState,
+
         ) {
             for(marker in mainViewModel.mapState.toiletMarkers){
                 Marker(
@@ -81,3 +86,5 @@ enum class ToiletIcons(val icon: BitmapDescriptor){
     ToiletRed(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)),
     ToiletGreen(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
 }
+
+

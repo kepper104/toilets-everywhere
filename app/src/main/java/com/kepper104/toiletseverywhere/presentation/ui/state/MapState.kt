@@ -6,7 +6,7 @@ import com.google.maps.android.compose.MapProperties
 import com.kepper104.toiletseverywhere.domain.model.Toilet
 
 data class MapState (
-    val properties: MapProperties = MapProperties(),
+    val properties: MapProperties = MapProperties(isMyLocationEnabled = true),
     val cameraPosition: CameraPosition = CameraPosition(LatLng(55.80344037191546, 37.409658491929854), 10F, 0F, 0F),
     val toiletMarkers: List<ToiletMarker> = emptyList()
 )
