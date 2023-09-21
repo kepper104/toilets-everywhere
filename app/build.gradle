@@ -10,7 +10,7 @@ plugins {
 
 android {
     namespace 'com.kepper104.toiletseverywhere'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.kepper104.toiletseverywhere"
