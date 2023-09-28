@@ -43,6 +43,20 @@ object AppModule {
             .create(MainApi::class.java)
     }
 
+//    @Singleton
+//    @Provides
+//    fun provideDirectionsApi(): DirectionsApi {
+//        val moshi = Moshi.Builder()
+//            .add(KotlinJsonAdapterFactory())
+//            .build()
+//
+//        return Retrofit.Builder()
+//            .addConverterFactory(MoshiConverterFactory.create(moshi))
+//            .baseUrl("https://maps.googleapis.com/maps/api/directions/json")
+//            .build()
+//            .create(DirectionsApi::class.java)
+//    }
+
     @Provides
     @Singleton
     fun providePreferencesDataStore(@ApplicationContext appContext: Context): DataStore<Preferences> =

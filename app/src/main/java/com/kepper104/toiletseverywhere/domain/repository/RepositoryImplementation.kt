@@ -23,20 +23,17 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 @OptIn(DelicateCoroutinesApi::class)
 class RepositoryImplementation (
-    private val api: MainApi,
+    private val mainApi: MainApi,
     private val dataStore: DataStore<Preferences>
 ) : Repository{
 
     override var currentUser: LocalUser = LocalUser()
 
     override var loginStatus: LoginStatus = LoginStatus.None
-
-
-//    override var _isLoggedIn = MutableStateFlow(false)
-//    override var isLoggedIn = _isLoggedIn.asStateFlow()
 
     init {
         GlobalScope.launch {
@@ -50,7 +47,7 @@ class RepositoryImplementation (
 
 
     override suspend fun retrieveToilets(): List<Toilet>? {
-        val toilets = api.getToilets()
+        val toilets = mainApi.getToilets()
         if (toilets.isSuccessful){
             return toilets.body()!!.map { apiToilet -> fromApiToilet(apiToilet) }
         }
@@ -58,7 +55,7 @@ class RepositoryImplementation (
     }
 
     override suspend fun retrieveToiletById(id: Int): Toilet? {
-        val toilet = api.getToiletById(id)
+        val toilet = mainApi.getToiletById(id)
 
         if (toilet.isSuccessful) {
             return fromApiToilet(toilet.body()!!)
@@ -67,7 +64,7 @@ class RepositoryImplementation (
     }
 
     override suspend fun retrieveUserById(id: Int): User? {
-        val user = api.getUserById(id)
+        val user = mainApi.getUserById(id)
         if (user.isSuccessful){
             return fromApiUser(user.body()!!)
         }
@@ -76,8 +73,9 @@ class RepositoryImplementation (
         return null
     }
 
+
     private suspend fun checkLogin(login: String, password: String): LoginResponse? {
-        val res = api.loginUser(LoginData(login, password))
+        val res = mainApi.loginUser(LoginData(login, password))
         Log.d(Tags.RepositoryLogger.toString(), "$res, ${res.isSuccessful}, ${res.body()}")
         if (res.isSuccessful){
             val user = res.body()!!
@@ -115,7 +113,7 @@ class RepositoryImplementation (
     override suspend fun register(login: String, password: String, displayName: String) {
         Log.d(Tags.RepositoryLogger.toString(), "Registering...")
 
-        val res = api.registerUser(RegisterData(login, password, displayName))
+        val res = mainApi.registerUser(RegisterData(login, password, displayName))
 
         if (res.isSuccessful){
             Log.d(Tags.RepositoryLogger.toString(), "Register success")
@@ -136,7 +134,7 @@ class RepositoryImplementation (
     }
 
     override suspend fun checkIfLoginExists(login: String): Boolean? {
-        val res = api.checkLogin(login)
+        val res = mainApi.checkLogin(login)
         // TODO naming of this function is clusterfucked
 
         if (res.isSuccessful){

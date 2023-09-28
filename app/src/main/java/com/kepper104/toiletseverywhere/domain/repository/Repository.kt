@@ -24,4 +24,5 @@ interface Repository{
     suspend fun retrieveToiletById(id: Int): Toilet?
 
     suspend fun retrieveUserById(id: Int): User?
+
 }

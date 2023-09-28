@@ -7,6 +7,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.MapProperties
 import com.kepper104.toiletseverywhere.data.AuthUiStatus
 import com.kepper104.toiletseverywhere.data.BottomBarDestination
 import com.kepper104.toiletseverywhere.data.LoginStatus
@@ -46,7 +50,6 @@ class MainViewModel @Inject constructor(
 
     lateinit var scaffoldPadding: PaddingValues
 
-
     init {
         collectLoginStatusFlow()
         try {
@@ -85,6 +88,29 @@ class MainViewModel @Inject constructor(
                 prevLoginStatus = repository.loginStatus
             }
             delay(200L)
+        }
+    }
+
+    fun enableLocationServices(locationClient: FusedLocationProviderClient){
+        mapState = mapState.copy(properties = MapProperties(isMyLocationEnabled = true))
+        viewModelScope.launch {
+            try{
+                Log.d(Tags.MainViewModelTag.toString(), "Getting position on LocationServices enable")
+                val res = locationClient.lastLocation
+                res.addOnSuccessListener {
+                    mapState = mapState.copy(cameraPosition = CameraPosition(LatLng(res.result.latitude, res.result.longitude), 15F, 0F, 0F))
+                    Log.d(Tags.MainViewModelTag.toString(), "Successfully got position on LocationServices enable")
+                }
+                res.addOnFailureListener{
+                    Log.e(Tags.MainViewModelTag.toString(),  it.toString())
+                }
+
+
+
+            } catch (e: SecurityException){
+                Log.e(Tags.MainViewModelTag.toString(), "Location permission not granted")
+            }
+
         }
     }
 
