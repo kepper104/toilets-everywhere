@@ -23,13 +23,11 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.kepper104.toiletseverywhere.data.Tags
+import com.kepper104.toiletseverywhere.data.getDistanceMeters
+import com.kepper104.toiletseverywhere.data.getToiletOpenString
 import com.kepper104.toiletseverywhere.presentation.MainViewModel
 import com.kepper104.toiletseverywhere.presentation.ui.state.CurrentDetailsScreen
 import com.ramcosta.composedestinations.annotation.Destination
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.sqrt
 
 
 @Destination
@@ -66,17 +64,13 @@ fun MapScreen(
             properties = mainViewModel.mapState.properties,
             uiSettings = mapUiSettings,
             cameraPositionState = cameraPositionState,
-
         ) {
             for(marker in mainViewModel.mapState.toiletMarkers){
-                val res = FloatArray(5)
                 Marker(
                     state = MarkerState(position = marker.position),
                     title = "Public toilet",
-                    icon = if (marker.isPublic){
-                        ToiletIcons.ToiletGreen.icon} else {
-                        ToiletIcons.ToiletRed.icon},
-                    snippet = "Open, ${Location.distanceBetween(mainViewModel.mapState.userPosition.latitude, mainViewModel.mapState.userPosition.longitude, marker.position.latitude, marker.position.longitude, res)}",
+                    icon = getToiletIcon(marker.isPublic),
+                    snippet = "${getToiletOpenString(marker.toilet)}, ${getDistanceMeters(mainViewModel.mapState.userPosition, marker.position)}",
                     onInfoWindowClick = {mainViewModel.navigateToDetails(marker.toilet, CurrentDetailsScreen.MAP)}
                 )
 
@@ -90,4 +84,11 @@ enum class ToiletIcons(val icon: BitmapDescriptor){
     ToiletGreen(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
 }
 
+fun getToiletIcon(isPublic: Boolean): BitmapDescriptor {
+    return if (isPublic){
+        ToiletIcons.ToiletGreen.icon
+    } else {
+        ToiletIcons.ToiletRed.icon
+    }
+}
 

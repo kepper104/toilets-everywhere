@@ -1,5 +1,6 @@
 package com.kepper104.toiletseverywhere.data
 
+import android.location.Location
 import com.google.android.gms.maps.model.LatLng
 import com.kepper104.toiletseverywhere.domain.model.ApiToilet
 import com.kepper104.toiletseverywhere.domain.model.ApiUser
@@ -61,4 +62,22 @@ fun fromApiUser(apiUser: ApiUser): User{
         displayName = apiUser.display_name_,
         creationDate = creationDate
     )
+}
+
+fun getDistanceMeters(userPosition: LatLng, markerPosition: LatLng): String {
+    val res = FloatArray(10)
+    Location.distanceBetween(userPosition.latitude, userPosition.longitude, markerPosition.latitude, markerPosition.longitude, res)
+    val distanceMeters = res[0].toInt()
+    return if (distanceMeters < 1000) distanceMeters.toString() + "m"
+    else (distanceMeters / 1000).toString() + "km"
+}
+
+fun getToiletOpenString(toilet: Toilet): String {
+    val currentTime = LocalTime.now()
+    if (toilet.openingTime <= currentTime &&  currentTime <= toilet.closingTime){
+        return "Open"
+    }
+    return "Closed"
+
+
 }
