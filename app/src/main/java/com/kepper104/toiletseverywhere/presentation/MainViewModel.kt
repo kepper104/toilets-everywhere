@@ -47,6 +47,8 @@ class MainViewModel @Inject constructor(
     var detailsState by mutableStateOf(DetailsState())
     var navigationState by mutableStateOf(NavigationState())
 
+    private lateinit var locationClient: FusedLocationProviderClient
+
 
     lateinit var scaffoldPadding: PaddingValues
 
@@ -91,27 +93,59 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun enableLocationServices(locationClient: FusedLocationProviderClient){
+    fun enableLocationServices(locationProviderClient: FusedLocationProviderClient){
         mapState = mapState.copy(properties = MapProperties(isMyLocationEnabled = true))
+        locationClient = locationProviderClient
         viewModelScope.launch {
             try{
                 Log.d(Tags.MainViewModelTag.toString(), "Getting position on LocationServices enable")
                 val res = locationClient.lastLocation
                 res.addOnSuccessListener {
-                    mapState = mapState.copy(cameraPosition = CameraPosition(LatLng(res.result.latitude, res.result.longitude), 15F, 0F, 0F))
+
+                    mapState = mapState.copy(
+                        cameraPosition = CameraPosition(LatLng(res.result.latitude, res.result.longitude), 15F, 0F, 0F),
+                        userPosition = LatLng(res.result.latitude, res.result.longitude)
+                    )
                     Log.d(Tags.MainViewModelTag.toString(), "Successfully got position on LocationServices enable")
                 }
                 res.addOnFailureListener{
                     Log.e(Tags.MainViewModelTag.toString(),  it.toString())
                 }
 
-
-
             } catch (e: SecurityException){
                 Log.e(Tags.MainViewModelTag.toString(), "Location permission not granted")
             }
 
         }
+    }
+
+    fun startLocationRefreshCycle() {
+        viewModelScope.launch {
+            while (true) {
+                refreshUserLocation()
+                delay(5000)
+            }
+        }
+    }
+
+    private fun refreshUserLocation(){
+        try{
+            Log.d(Tags.MainViewModelTag.toString(), "Getting position on location refresh")
+            val res = locationClient.lastLocation
+            res.addOnSuccessListener {
+                mapState = mapState.copy(userPosition = LatLng(res.result.latitude, res.result.longitude))
+
+                Log.d(Tags.MainViewModelTag.toString(), "Successfully got position on LocationServices enable")
+            }
+            res.addOnFailureListener{
+                Log.e(Tags.MainViewModelTag.toString(),  it.toString())
+            }
+
+        } catch (e: SecurityException){
+            Log.e(Tags.MainViewModelTag.toString(), "Location permission not granted")
+        }
+
+
     }
 
     fun changeNavigationState(newDestination: BottomBarDestination){
