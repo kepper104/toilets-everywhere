@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -75,11 +76,24 @@ fun ToiletCard(toilet: Toilet = Toilet(), navigateToDetails: (toilet: Toilet, so
     ) {
         Row {
 //            Text(text = "ID: ${toilet.id}   ")
-            Text(text = "$toilet")
+            Text(
+                text = if (toilet.isPublic) "Public toilet" else {"a"}
+            )
+            Spacer(modifier = Modifier.width(20.dp))
+            Text(text = "Created by ${toilet.authorId} on ${toilet.creationDate}")
+        }
+        Row {
+
         }
     }
+
 }
 
 fun placeHolderFunc(toilet: Toilet, source: CurrentDetailsScreen): Unit {
 
+}
+
+@Composable
+fun AttributeBadge() {
+    
 }
