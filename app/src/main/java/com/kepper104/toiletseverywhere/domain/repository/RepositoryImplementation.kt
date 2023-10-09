@@ -49,7 +49,9 @@ class RepositoryImplementation (
     override suspend fun retrieveToilets(): List<Toilet>? {
         val toilets = mainApi.getToilets()
         if (toilets.isSuccessful){
-            return toilets.body()!!.map { apiToilet -> fromApiToilet(apiToilet) }
+            val mappedToilets = toilets.body()!!.map { apiToilet -> fromApiToilet(apiToilet) }
+            val res = mappedToilets.map { toilet ->  toilet.copy(authorName = retrieveUsernameById(toilet.authorId))}
+            return res
         }
         return null
     }
@@ -71,6 +73,12 @@ class RepositoryImplementation (
         Log.e(Tags.RepositoryLogger.toString(), "User by id not found")
 
         return null
+    }
+
+    private suspend fun retrieveUsernameById(id: Int): String{
+        val user = retrieveUserById(id)
+
+        return user?.displayName ?: "Error"
     }
 
 

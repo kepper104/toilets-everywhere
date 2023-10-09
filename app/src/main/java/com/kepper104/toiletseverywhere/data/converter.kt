@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter
 
 val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+val timeFormatter1: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 fun fromApiToilet(apiToilet: ApiToilet): Toilet{
 
@@ -40,7 +41,8 @@ fun fromApiToilet(apiToilet: ApiToilet): Toilet{
         creationDate = creationDate,
         openingTime = openingTime,
         closingTime = closingTime,
-        cost = apiToilet.cost_
+        cost = apiToilet.cost_,
+        authorName = "ToBeRetrieved"
     )
 }
 
@@ -78,6 +80,12 @@ fun getToiletOpenString(toilet: Toilet): String {
         return "Open"
     }
     return "Closed"
+}
 
+fun getToiletWorkingHours(toilet: Toilet, includeFromTo: Boolean = false): String {
+    val openingTime = toilet.openingTime.format(timeFormatter1)
+    val closingTime = toilet.closingTime.format(timeFormatter1)
 
+    if (includeFromTo) return "From $openingTime to $closingTime"
+    else return "$openingTime - $closingTime"
 }

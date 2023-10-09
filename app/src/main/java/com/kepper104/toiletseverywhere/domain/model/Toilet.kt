@@ -16,4 +16,5 @@ data class Toilet (
     val openingTime: LocalTime = LocalTime.of(0, 0, 0),
     val closingTime: LocalTime = LocalTime.of(23, 59, 59),
     val cost: Int = 0,
+    val authorName: String = "Unnamed Author"
 )

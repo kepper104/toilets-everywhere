@@ -1,5 +1,6 @@
 package com.kepper104.toiletseverywhere.presentation.ui.screen
 
+import android.graphics.drawable.Icon
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -13,15 +14,24 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Accessible
+import androidx.compose.material.icons.filled.BabyChangingStation
+import androidx.compose.material.icons.filled.LocalParking
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kepper104.toiletseverywhere.data.Tags
+import com.kepper104.toiletseverywhere.data.getToiletOpenString
+import com.kepper104.toiletseverywhere.data.getToiletWorkingHours
 import com.kepper104.toiletseverywhere.domain.model.Toilet
 import com.kepper104.toiletseverywhere.presentation.MainViewModel
 import com.kepper104.toiletseverywhere.presentation.ui.state.CurrentDetailsScreen
@@ -79,12 +89,20 @@ fun ToiletCard(toilet: Toilet = Toilet(), navigateToDetails: (toilet: Toilet, so
             Text(
                 text = if (toilet.isPublic) "Public toilet" else {"a"}
             )
-            Spacer(modifier = Modifier.width(20.dp))
-            Text(text = "Created by ${toilet.authorId} on ${toilet.creationDate}")
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = "Created by ${toilet.authorName} on ${toilet.creationDate}",
+                modifier = Modifier
+                    )
         }
         Row {
-
+            AttributeBadge(icon = Icons.Default.LocalParking, enabled = toilet.parkingNearby)
+            AttributeBadge(icon = Icons.Default.Accessible, enabled = toilet.disabledAccess)
+            AttributeBadge(icon = Icons.Default.BabyChangingStation, enabled = toilet.babyAccess)
         }
+        Text(text = "Currently ${getToiletOpenString(toilet)} - working hours ${getToiletWorkingHours(toilet)}")
+        Text(text = if (toilet.cost == 0) "Free" else toilet.cost.toString() + "₽")
+
     }
 
 }
@@ -94,6 +112,11 @@ fun placeHolderFunc(toilet: Toilet, source: CurrentDetailsScreen): Unit {
 }
 
 @Composable
-fun AttributeBadge() {
+fun AttributeBadge(icon: ImageVector, enabled: Boolean) {
+    Icon(
+        imageVector = icon,
+        contentDescription = icon.name,
+        tint = if (enabled) Color.White else Color.Gray
+    )
     
 }

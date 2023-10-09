@@ -29,7 +29,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import java.net.UnknownHostException
 import javax.inject.Inject
 
 
@@ -190,7 +189,7 @@ class MainViewModel @Inject constructor(
             toiletsState = toiletsState.copy(toiletList = toilets)
 
             Log.d(Tags.MainViewModelTag.toString(), "Saved toilets $toilets")
-            refreshToilets()
+            refreshToiletMarkers()
 
         }
 
@@ -210,6 +209,14 @@ class MainViewModel @Inject constructor(
         }
     }
 
+//    fun getUserNameById(id: Int): String{
+//            val author = repository.retrieveUserById(id)
+//            val authorName = author?.displayName ?: "Error"
+//            return authorName
+//
+//
+//    }
+
     fun leaveDetailsScreen(){
         Log.d(Tags.MainViewModelTag.toString(), "Leaving details screen")
         detailsState = detailsState.copy(toilet = null, currentDetailScreen = CurrentDetailsScreen.NONE)
@@ -217,7 +224,7 @@ class MainViewModel @Inject constructor(
 
 
     }
-    private fun refreshToilets(){
+    private fun refreshToiletMarkers(){
         Log.d(Tags.MainViewModelTag.toString(), "Refreshing toilets")
 
         mapState = mapState.copy(toiletMarkers = toiletsState.toiletList.map { toilet ->  toToiletMarker(toilet)})
