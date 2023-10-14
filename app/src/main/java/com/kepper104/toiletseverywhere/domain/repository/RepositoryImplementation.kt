@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.kepper104.toiletseverywhere.data.LoginStatus
+import com.kepper104.toiletseverywhere.data.NOT_LOGGED_IN_STRING
 import com.kepper104.toiletseverywhere.data.Tags
 import com.kepper104.toiletseverywhere.data.api.LoginData
 import com.kepper104.toiletseverywhere.data.api.LoginResponse
@@ -203,7 +204,7 @@ class RepositoryImplementation (
         }
 
         dataStore.edit {
-            it[stringPreferencesKey("displayName")] = "Unnamed"
+            it[stringPreferencesKey("displayName")] = NOT_LOGGED_IN_STRING
         }
 
         dataStore.edit {
@@ -217,7 +218,7 @@ class RepositoryImplementation (
     private suspend fun refreshCurrentUser(){
         val id = dataStore.data.first()[intPreferencesKey("id")] ?: 0
         val isLoggedIn = dataStore.data.first()[booleanPreferencesKey("isLoggedIn")] ?: false
-        val displayName = dataStore.data.first()[stringPreferencesKey("displayName")] ?: "Unnamed"
+        val displayName = dataStore.data.first()[stringPreferencesKey("displayName")] ?: NOT_LOGGED_IN_STRING
         val creationDate = dataStore.data.first()[stringPreferencesKey("creationDate")] ?: "2023-01-01"
 
         currentUser.id = id

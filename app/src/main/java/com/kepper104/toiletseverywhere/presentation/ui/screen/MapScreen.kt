@@ -25,6 +25,7 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.kepper104.toiletseverywhere.data.ScreenEvent
 import com.kepper104.toiletseverywhere.data.Tags
 import com.kepper104.toiletseverywhere.data.getDistanceMeters
 import com.kepper104.toiletseverywhere.data.getToiletOpenString
@@ -47,6 +48,7 @@ fun MapScreen(
     }
 
     HandleEvents(viewModel = mainViewModel, composeContext = LocalContext.current)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -87,61 +89,7 @@ fun MapScreen(
         }
     }
 }
-@Composable
-fun HandleEvents(viewModel: MainViewModel, composeContext: Context) {
-    val loggerTag = "EventLogger"
-    LaunchedEffect(key1 = true) {
-        viewModel.eventFlow.collect { event ->
-            when (event) {
-//                NoteViewModel.ScreenEvent.NoteSavedToast -> {
-//                    Log.v(loggerTag, "NoteSaved event received!")
-//
-//                    makeToast("Note Saved!", composeContext)
-//                }
-//                NoteViewModel.ScreenEvent.NoteDeletedSnackBar -> {
-//                    Log.v(loggerTag, "NoteDeleted event received!")
-//
-//                    Log.d(loggerTag, "Showing snackbar!")
-//
-//                    noteViewModel.mainState = noteViewModel.mainState.copy(
-//                        isAbleToDeleteNotes = false
-//                    )
-//                    val snackBarResult = snackbarHostState.showSnackbar(
-//                        message = "Note Deleted!",
-//                        actionLabel = "Undo",
-//                        withDismissAction = true,
-//                        duration = SnackbarDuration.Short
-//                    )
-//
-//                    Log.v(loggerTag, "Finished showing snackbar!")
-//
-//                    noteViewModel.mainState = noteViewModel.mainState.copy(
-//                        isAbleToDeleteNotes = true
-//                    )
-//
-//                    when(snackBarResult){
-//                        SnackbarResult.Dismissed -> {
-//                            Log.d(loggerTag, "Note deleted!")
-//                        }
-//
-//                        SnackbarResult.ActionPerformed -> {
-//                            noteViewModel.restoreLastDeletedNote()
-////                            Log.d(TAG, "Note restored!")
-//                        }
-//                    }
-//                    Log.v(loggerTag, "End of snackbar launched effect")
-//                }
-                MainViewModel.ScreenEvent.ToiletAddingEnabledToast -> {
-                    makeToast("Long tap on map to add toilet", composeContext, Toast.LENGTH_LONG)
-                }
 
-                MainViewModel.ScreenEvent.ToiletAddingDisabledToast -> {
-                    makeToast("Toilet adding disabled", composeContext, Toast.LENGTH_LONG)
-                }
-            }
-        }
-    }
-}
 
 enum class ToiletIcons(val icon: BitmapDescriptor){
     ToiletRed(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)),

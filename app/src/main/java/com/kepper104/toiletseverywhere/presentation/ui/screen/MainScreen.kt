@@ -1,7 +1,9 @@
 package com.kepper104.toiletseverywhere.presentation.ui.screen
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -9,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
+import com.kepper104.toiletseverywhere.data.ScreenEvent
 import com.kepper104.toiletseverywhere.data.Tags
 import com.kepper104.toiletseverywhere.presentation.MainViewModel
 import com.kepper104.toiletseverywhere.presentation.navigation.BottomNavigationBar
@@ -35,7 +38,7 @@ fun MainScreen(
     var currentRoute: Route = AuthScreenDestination
 
     val isLoggedInFlowChecker = mainViewModel.isLoggedInFlow.collectAsState(initial = null)
-    mainViewModel.addLoggedInChecker(isLoggedInFlowChecker)
+//    mainViewModel.addLoggedInChecker(isLoggedInFlowChecker)
 
     if (isLoggedInFlowChecker.value == false){
         currentRoute = AuthScreenDestination
@@ -52,6 +55,8 @@ fun MainScreen(
             launchSingleTop = true
         }
     }
+
+    HandleEvents(viewModel = mainViewModel, composeContext = LocalContext.current)
 
     NavScaffold(
         navController = navController,
@@ -72,5 +77,27 @@ fun MainScreen(
             navController = navController,
             startRoute = currentRoute
         )
+    }
+}
+
+@Composable
+fun HandleEvents(viewModel: MainViewModel, composeContext: Context) {
+    val loggerTag = "EventLogger"
+    LaunchedEffect(key1 = true) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                ScreenEvent.ToiletAddingDisabledToast -> {
+                    makeToast("Toilet adding disabled", composeContext, Toast.LENGTH_LONG)
+                }
+
+                ScreenEvent.ToiletAddingEnabledToast -> {
+                    makeToast("Long tap on map to add toilet", composeContext, Toast.LENGTH_LONG)
+                }
+
+                ScreenEvent.PlaceholderFunction -> {
+                    makeToast("This function is not implemented", composeContext, Toast.LENGTH_SHORT)
+                }
+            }
+        }
     }
 }

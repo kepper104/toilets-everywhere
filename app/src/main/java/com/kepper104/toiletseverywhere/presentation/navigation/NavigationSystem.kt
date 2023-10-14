@@ -1,12 +1,15 @@
 package com.kepper104.toiletseverywhere.presentation.navigation
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,6 +24,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.kepper104.toiletseverywhere.data.BottomBarDestination
+import com.kepper104.toiletseverywhere.data.NOT_LOGGED_IN_STRING
+import com.kepper104.toiletseverywhere.data.ScreenEvent
+import com.kepper104.toiletseverywhere.data.Tags
 import com.kepper104.toiletseverywhere.presentation.MainViewModel
 import com.kepper104.toiletseverywhere.presentation.ui.screen.NavGraphs
 import com.kepper104.toiletseverywhere.presentation.ui.screen.appCurrentDestinationAsState
@@ -105,7 +111,6 @@ fun NavScaffold(
         bottomBar = { bottomBar(destination) },
         content = content
     )
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -146,26 +151,32 @@ fun MapTopAppBar() {
                 return@TopAppBar
             }
             if (mainViewModel.navigationState.currentDestination == BottomBarDestination.MapView){
+                Log.d(Tags.CompositionLogger.toString(), "Showing buttons for MapView")
 
-                if (mainViewModel.isLoggedInFlowChecker.value == true){
+                if (mainViewModel.loggedInUserState.currentUserName != NOT_LOGGED_IN_STRING){
+                    Log.d(Tags.CompositionLogger.toString(), "Showing Add Toilet button")
                     IconButton(onClick = {
                         if (!mainViewModel.mapState.addingToilet){
-                            mainViewModel.triggerEvent(MainViewModel.ScreenEvent.ToiletAddingEnabledToast)
+                            mainViewModel.triggerEvent(ScreenEvent.ToiletAddingEnabledToast)
                             mainViewModel.mapState = mainViewModel.mapState.copy(addingToilet = true)
                         }else{
-                            mainViewModel.triggerEvent(MainViewModel.ScreenEvent.ToiletAddingDisabledToast)
+                            mainViewModel.triggerEvent(ScreenEvent.ToiletAddingDisabledToast)
                             mainViewModel.mapState = mainViewModel.mapState.copy(addingToilet = false)
                         }
 
                     }) {
                         Icon(imageVector =
                                 if (mainViewModel.mapState.addingToilet)
-                                    Icons.Default.AddCircleOutline
+                                    Icons.Filled.AddCircle
                                 else
                                     Icons.Filled.AddCircleOutline,
 
                             contentDescription = "Add a new toilet")
                     }
+                }
+                else{
+                    Log.d(Tags.CompositionLogger.toString(), "NOT Showing Add Toilet button")
+
                 }
                 IconButton(onClick = { mainViewModel.placeholder() }) {
                     Icon(imageVector = Icons.Default.FilterAlt, contentDescription = "Filter toilets")

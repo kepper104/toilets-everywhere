@@ -2,7 +2,6 @@ package com.kepper104.toiletseverywhere.presentation
 
 import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -16,6 +15,7 @@ import com.kepper104.toiletseverywhere.data.AuthUiStatus
 import com.kepper104.toiletseverywhere.data.BottomBarDestination
 import com.kepper104.toiletseverywhere.data.LoginStatus
 import com.kepper104.toiletseverywhere.data.RegistrationError
+import com.kepper104.toiletseverywhere.data.ScreenEvent
 import com.kepper104.toiletseverywhere.data.Tags
 import com.kepper104.toiletseverywhere.data.toToiletMarker
 import com.kepper104.toiletseverywhere.domain.model.Toilet
@@ -23,17 +23,15 @@ import com.kepper104.toiletseverywhere.domain.repository.Repository
 import com.kepper104.toiletseverywhere.presentation.ui.state.AuthState
 import com.kepper104.toiletseverywhere.presentation.ui.state.CurrentDetailsScreen
 import com.kepper104.toiletseverywhere.presentation.ui.state.DetailsState
+import com.kepper104.toiletseverywhere.presentation.ui.state.LoggedInUserState
 import com.kepper104.toiletseverywhere.presentation.ui.state.MapState
 import com.kepper104.toiletseverywhere.presentation.ui.state.NavigationState
 import com.kepper104.toiletseverywhere.presentation.ui.state.ToiletsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -51,20 +49,18 @@ class MainViewModel @Inject constructor(
     var authState by mutableStateOf(AuthState())
     var detailsState by mutableStateOf(DetailsState())
     var navigationState by mutableStateOf(NavigationState())
+    var loggedInUserState by mutableStateOf(LoggedInUserState())
 
     private val _eventFlow = MutableSharedFlow<ScreenEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    sealed class ScreenEvent{
-        object ToiletAddingEnabledToast: ScreenEvent()
-        object ToiletAddingDisabledToast: ScreenEvent()
-    }
+
 
     private lateinit var locationClient: FusedLocationProviderClient
 
 
     lateinit var scaffoldPadding: PaddingValues
-    lateinit var isLoggedInFlowChecker: State<Boolean?>
+//    lateinit var isLoggedInFlowChecker: State<Boolean?>
 
     init {
         collectLoginStatusFlow()
@@ -82,6 +78,7 @@ class MainViewModel @Inject constructor(
 
         while(true){
             if (prevLoggedInValue != repository.currentUser.isLoggedIn){
+                saveLoggedInUser(repository.currentUser.isLoggedIn, repository.currentUser.displayName)
                 Log.d(Tags.MainViewModelTag.toString(), "Status changed! $prevLoggedInValue -> ${repository.currentUser.isLoggedIn}")
                 emit(repository.currentUser.isLoggedIn)
                 prevLoggedInValue = repository.currentUser.isLoggedIn
@@ -114,9 +111,7 @@ class MainViewModel @Inject constructor(
             _eventFlow.emit(event)
         }
     }
-    fun addLoggedInChecker(loggedInChecker: State<Boolean?>){
-        isLoggedInFlowChecker = loggedInChecker
-    }
+
 
     fun enableLocationServices(locationProviderClient: FusedLocationProviderClient){
         mapState = mapState.copy(properties = MapProperties(isMyLocationEnabled = true))
@@ -169,13 +164,19 @@ class MainViewModel @Inject constructor(
         } catch (e: SecurityException){
             Log.e(Tags.MainViewModelTag.toString(), "Location permission not granted")
         }
-
-
     }
 
     fun changeNavigationState(newDestination: BottomBarDestination){
         navigationState = navigationState.copy(currentDestination = newDestination)
+
+        if (!mapState.addingToilet) return
+
+        if (newDestination != BottomBarDestination.MapView){
+            mapState = mapState.copy(addingToilet = false)
+            triggerEvent(ScreenEvent.ToiletAddingDisabledToast) // TODO potentially remove
+        }
     }
+
 
     private fun collectLoginStatusFlow(){
         viewModelScope.launch {
@@ -197,6 +198,14 @@ class MainViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun saveLoggedInUser(isLoggedIn: Boolean, newUserName: String){
+        Log.d(Tags.MainViewModelTag.toString(), "Saving user data to vm: $isLoggedIn, $newUserName")
+        loggedInUserState = loggedInUserState.copy(
+            isLoggedIn = isLoggedIn,
+            currentUserName = newUserName
+        )
     }
 
     fun getLatestToilets(){
@@ -235,13 +244,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-//    fun getUserNameById(id: Int): String{
-//            val author = repository.retrieveUserById(id)
-//            val authorName = author?.displayName ?: "Error"
-//            return authorName
-//
-//
-//    }
 
     fun leaveDetailsScreen(){
         Log.d(Tags.MainViewModelTag.toString(), "Leaving details screen")
@@ -263,7 +265,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun placeholder(){
-        TODO("Placeholder Here")
+        triggerEvent(ScreenEvent.PlaceholderFunction)
     }
 
 

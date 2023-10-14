@@ -35,7 +35,7 @@ fun SettingsScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-
+            Text(text = "Current Display Name: ${mainViewModel.loggedInUserState.currentUserName}")
             Button(
                 onClick = {
                     mainViewModel.logout()
