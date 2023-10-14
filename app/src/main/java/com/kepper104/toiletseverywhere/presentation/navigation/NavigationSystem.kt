@@ -16,6 +16,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -32,6 +33,7 @@ import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.navigation.popBackStack
 import com.ramcosta.composedestinations.navigation.popUpTo
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
+import kotlinx.coroutines.flow.collectLatest
 
 
 val destinationToDetailScreenMapping = mapOf(CurrentDetailsScreen.MAP to BottomBarDestination.MapView, CurrentDetailsScreen.LIST to BottomBarDestination.ListView)
@@ -111,7 +113,6 @@ fun NavScaffold(
 fun MapTopAppBar() {
     val mainViewModel: MainViewModel = hiltViewModel(LocalContext.current as ComponentActivity)
 
-    // TODO show add toilet button only if logged in
     TopAppBar(
         title = {
             when (mainViewModel.navigationState.currentDestination) {
@@ -145,15 +146,34 @@ fun MapTopAppBar() {
                 return@TopAppBar
             }
             if (mainViewModel.navigationState.currentDestination == BottomBarDestination.MapView){
-                IconButton(onClick = { mainViewModel.placeholder() }) {
-                    Icon(imageVector = Icons.Default.FilterAlt, contentDescription = "Filter toilets")
+
+                if (mainViewModel.isLoggedInFlowChecker.value == true){
+                    IconButton(onClick = {
+                        if (!mainViewModel.mapState.addingToilet){
+                            mainViewModel.triggerEvent(MainViewModel.ScreenEvent.ToiletAddingEnabledToast)
+                            mainViewModel.mapState = mainViewModel.mapState.copy(addingToilet = true)
+                        }else{
+                            mainViewModel.triggerEvent(MainViewModel.ScreenEvent.ToiletAddingDisabledToast)
+                            mainViewModel.mapState = mainViewModel.mapState.copy(addingToilet = false)
+                        }
+
+                    }) {
+                        Icon(imageVector =
+                                if (mainViewModel.mapState.addingToilet)
+                                    Icons.Default.AddCircleOutline
+                                else
+                                    Icons.Filled.AddCircleOutline,
+
+                            contentDescription = "Add a new toilet")
+                    }
                 }
                 IconButton(onClick = { mainViewModel.placeholder() }) {
-                    Icon(imageVector = Icons.Default.AddCircleOutline, contentDescription = "Add a new toilet")
+                    Icon(imageVector = Icons.Default.FilterAlt, contentDescription = "Filter toilets")
                 }
                 IconButton(onClick = { mainViewModel.getLatestToilets() }) {
                     Icon(imageVector = Icons.Default.Refresh, contentDescription = "Refresh toilets")
                 }
+
             }else if (mainViewModel.navigationState.currentDestination == BottomBarDestination.ListView){
                 IconButton(onClick = { mainViewModel.placeholder() }) {
                     Icon(imageVector = Icons.Default.FilterAlt, contentDescription = "Filter toilets")

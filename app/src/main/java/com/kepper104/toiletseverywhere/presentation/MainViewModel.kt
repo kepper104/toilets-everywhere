@@ -2,6 +2,7 @@ package com.kepper104.toiletseverywhere.presentation
 
 import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -27,7 +28,12 @@ import com.kepper104.toiletseverywhere.presentation.ui.state.NavigationState
 import com.kepper104.toiletseverywhere.presentation.ui.state.ToiletsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -46,10 +52,19 @@ class MainViewModel @Inject constructor(
     var detailsState by mutableStateOf(DetailsState())
     var navigationState by mutableStateOf(NavigationState())
 
+    private val _eventFlow = MutableSharedFlow<ScreenEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
+    sealed class ScreenEvent{
+        object ToiletAddingEnabledToast: ScreenEvent()
+        object ToiletAddingDisabledToast: ScreenEvent()
+    }
+
     private lateinit var locationClient: FusedLocationProviderClient
 
 
     lateinit var scaffoldPadding: PaddingValues
+    lateinit var isLoggedInFlowChecker: State<Boolean?>
 
     init {
         collectLoginStatusFlow()
@@ -90,6 +105,17 @@ class MainViewModel @Inject constructor(
             }
             delay(200L)
         }
+    }
+
+
+
+    fun triggerEvent(event: ScreenEvent){
+        viewModelScope.launch {
+            _eventFlow.emit(event)
+        }
+    }
+    fun addLoggedInChecker(loggedInChecker: State<Boolean?>){
+        isLoggedInFlowChecker = loggedInChecker
     }
 
     fun enableLocationServices(locationProviderClient: FusedLocationProviderClient){

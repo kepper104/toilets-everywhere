@@ -35,6 +35,7 @@ fun MainScreen(
     var currentRoute: Route = AuthScreenDestination
 
     val isLoggedInFlowChecker = mainViewModel.isLoggedInFlow.collectAsState(initial = null)
+    mainViewModel.addLoggedInChecker(isLoggedInFlowChecker)
 
     if (isLoggedInFlowChecker.value == false){
         currentRoute = AuthScreenDestination

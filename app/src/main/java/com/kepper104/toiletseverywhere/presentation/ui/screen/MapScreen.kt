@@ -1,13 +1,16 @@
 package com.kepper104.toiletseverywhere.presentation.ui.screen
 
+import android.content.Context
 import android.location.Location
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +46,7 @@ fun MapScreen(
         position = mainViewModel.mapState.cameraPosition
     }
 
+    HandleEvents(viewModel = mainViewModel, composeContext = LocalContext.current)
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -64,6 +68,11 @@ fun MapScreen(
             properties = mainViewModel.mapState.properties,
             uiSettings = mapUiSettings,
             cameraPositionState = cameraPositionState,
+            onMapLongClick = {
+                if (mainViewModel.mapState.addingToilet){
+                    Log.d("ToiletAddLogger", "Adding toilet: $it")
+                }
+            }
         ) {
             for(marker in mainViewModel.mapState.toiletMarkers){
                 Marker(
@@ -74,6 +83,61 @@ fun MapScreen(
                     onInfoWindowClick = {mainViewModel.navigateToDetails(marker.toilet, CurrentDetailsScreen.MAP)}
                 )
 
+            }
+        }
+    }
+}
+@Composable
+fun HandleEvents(viewModel: MainViewModel, composeContext: Context) {
+    val loggerTag = "EventLogger"
+    LaunchedEffect(key1 = true) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+//                NoteViewModel.ScreenEvent.NoteSavedToast -> {
+//                    Log.v(loggerTag, "NoteSaved event received!")
+//
+//                    makeToast("Note Saved!", composeContext)
+//                }
+//                NoteViewModel.ScreenEvent.NoteDeletedSnackBar -> {
+//                    Log.v(loggerTag, "NoteDeleted event received!")
+//
+//                    Log.d(loggerTag, "Showing snackbar!")
+//
+//                    noteViewModel.mainState = noteViewModel.mainState.copy(
+//                        isAbleToDeleteNotes = false
+//                    )
+//                    val snackBarResult = snackbarHostState.showSnackbar(
+//                        message = "Note Deleted!",
+//                        actionLabel = "Undo",
+//                        withDismissAction = true,
+//                        duration = SnackbarDuration.Short
+//                    )
+//
+//                    Log.v(loggerTag, "Finished showing snackbar!")
+//
+//                    noteViewModel.mainState = noteViewModel.mainState.copy(
+//                        isAbleToDeleteNotes = true
+//                    )
+//
+//                    when(snackBarResult){
+//                        SnackbarResult.Dismissed -> {
+//                            Log.d(loggerTag, "Note deleted!")
+//                        }
+//
+//                        SnackbarResult.ActionPerformed -> {
+//                            noteViewModel.restoreLastDeletedNote()
+////                            Log.d(TAG, "Note restored!")
+//                        }
+//                    }
+//                    Log.v(loggerTag, "End of snackbar launched effect")
+//                }
+                MainViewModel.ScreenEvent.ToiletAddingEnabledToast -> {
+                    makeToast("Long tap on map to add toilet", composeContext, Toast.LENGTH_LONG)
+                }
+
+                MainViewModel.ScreenEvent.ToiletAddingDisabledToast -> {
+                    makeToast("Toilet adding disabled", composeContext, Toast.LENGTH_LONG)
+                }
             }
         }
     }
@@ -91,4 +155,6 @@ fun getToiletIcon(isPublic: Boolean): BitmapDescriptor {
         ToiletIcons.ToiletRed.icon
     }
 }
-
+fun makeToast(message: String, ctx: Context, length: Int){
+    Toast.makeText(ctx, message, length).show()
+}

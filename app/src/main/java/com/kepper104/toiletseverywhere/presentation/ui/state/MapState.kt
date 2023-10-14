@@ -10,6 +10,7 @@ data class MapState (
     val cameraPosition: CameraPosition = CameraPosition(LatLng(55.80344037191546, 37.409658491929854), 10F, 0F, 0F),
     val toiletMarkers: List<ToiletMarker> = emptyList(),
     val userPosition: LatLng = LatLng(55.80344037191546, 37.409658491929854),
+    val addingToilet: Boolean = false
 )
 
 data class ToiletMarker(
