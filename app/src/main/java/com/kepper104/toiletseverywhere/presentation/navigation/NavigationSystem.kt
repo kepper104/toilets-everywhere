@@ -1,15 +1,17 @@
 package com.kepper104.toiletseverywhere.presentation.navigation
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,7 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -30,16 +32,15 @@ import com.kepper104.toiletseverywhere.data.Tags
 import com.kepper104.toiletseverywhere.presentation.MainViewModel
 import com.kepper104.toiletseverywhere.presentation.ui.screen.NavGraphs
 import com.kepper104.toiletseverywhere.presentation.ui.screen.appCurrentDestinationAsState
-import com.kepper104.toiletseverywhere.presentation.ui.screen.destinations.DetailsScreenDestination
 import com.kepper104.toiletseverywhere.presentation.ui.screen.destinations.MapScreenDestination
 import com.kepper104.toiletseverywhere.presentation.ui.screen.destinations.TypedDestination
+import com.kepper104.toiletseverywhere.presentation.ui.screen.makeToast
 import com.kepper104.toiletseverywhere.presentation.ui.screen.startAppDestination
 import com.kepper104.toiletseverywhere.presentation.ui.state.CurrentDetailsScreen
 import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.navigation.popBackStack
 import com.ramcosta.composedestinations.navigation.popUpTo
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
-import kotlinx.coroutines.flow.collectLatest
 
 
 val destinationToDetailScreenMapping = mapOf(CurrentDetailsScreen.MAP to BottomBarDestination.MapView, CurrentDetailsScreen.LIST to BottomBarDestination.ListView)
@@ -62,7 +63,7 @@ fun BottomNavigationBar(
 
                 onClick = {
                     if (mainViewModel.navigationState.currentDestination == destination){
-                        mainViewModel.leaveDetailsScreen()
+                        mainViewModel.leaveToiletViewDetailsScreen()
                     }
                     mainViewModel.changeNavigationState(destination)
 
@@ -124,14 +125,15 @@ fun MapTopAppBar() {
                 null -> {
                     Text(text = "Welcome!")
                 }
-                BottomBarDestination.MapView -> {
 
+                BottomBarDestination.MapView -> {
                     Text(text = "Toilet Map")
                 }
+
                 BottomBarDestination.ListView -> {
                     Text(text = "Toilet List")
-
                 }
+
                 BottomBarDestination.Settings -> {
                     Text(text = "Settings")
                 }
@@ -139,19 +141,27 @@ fun MapTopAppBar() {
         },
 
         navigationIcon = {
-            if(destinationToDetailScreenMapping[mainViewModel.detailsState.currentDetailScreen] == mainViewModel.navigationState.currentDestination && mainViewModel.navigationState.currentDestination != null){
-                IconButton(onClick = { mainViewModel.leaveDetailsScreen() }) {
+            if(destinationToDetailScreenMapping[mainViewModel.toiletViewDetailsState.currentDetailScreen] == mainViewModel.navigationState.currentDestination && mainViewModel.navigationState.currentDestination != null){
+                IconButton(onClick = { mainViewModel.leaveToiletViewDetailsScreen() }) {
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Go Back")
                 }
             }
 
         },
         actions = {
-            if (mainViewModel.detailsState.currentDetailScreen != CurrentDetailsScreen.NONE && destinationToDetailScreenMapping[mainViewModel.detailsState.currentDetailScreen] == mainViewModel.navigationState.currentDestination){
+            if (mainViewModel.toiletViewDetailsState.currentDetailScreen != CurrentDetailsScreen.NONE && destinationToDetailScreenMapping[mainViewModel.toiletViewDetailsState.currentDetailScreen] == mainViewModel.navigationState.currentDestination){
                 return@TopAppBar
             }
             if (mainViewModel.navigationState.currentDestination == BottomBarDestination.MapView){
                 Log.d(Tags.CompositionLogger.toString(), "Showing buttons for MapView")
+                if (mainViewModel.mapState.addingToilet){
+                    IconButton(onClick = { mainViewModel.navigateToNewToiletDetailsScreen(); mainViewModel.mapState = mainViewModel.mapState.copy(addingToilet = false) }) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = "Add toilet in selected point"
+                        )
+                    }
+                }
 
                 if (mainViewModel.loggedInUserState.currentUserName != NOT_LOGGED_IN_STRING){
                     Log.d(Tags.CompositionLogger.toString(), "Showing Add Toilet button")
@@ -167,7 +177,7 @@ fun MapTopAppBar() {
                     }) {
                         Icon(imageVector =
                                 if (mainViewModel.mapState.addingToilet)
-                                    Icons.Filled.AddCircle
+                                    Icons.Filled.Cancel
                                 else
                                     Icons.Filled.AddCircleOutline,
 
@@ -196,3 +206,25 @@ fun MapTopAppBar() {
         }
     )
 }
+@Composable
+fun HandleEvents(viewModel: MainViewModel, composeContext: Context) {
+    val loggerTag = "EventLogger"
+    LaunchedEffect(key1 = true) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                ScreenEvent.ToiletAddingDisabledToast -> {
+                    makeToast("Toilet adding canceled", composeContext, Toast.LENGTH_LONG)
+                }
+
+                ScreenEvent.ToiletAddingEnabledToast -> {
+                    makeToast("Move your map and press Tick to add toilet", composeContext, Toast.LENGTH_LONG)
+                }
+
+                ScreenEvent.PlaceholderFunction -> {
+                    makeToast("This function is not implemented", composeContext, Toast.LENGTH_SHORT)
+                }
+            }
+        }
+    }
+}
+

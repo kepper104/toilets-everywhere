@@ -1,7 +1,6 @@
 package com.kepper104.toiletseverywhere.presentation.ui.screen
 
 import android.content.Context
-import android.location.Location
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,13 +17,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.kepper104.toiletseverywhere.data.ScreenEvent
 import com.kepper104.toiletseverywhere.data.Tags
 import com.kepper104.toiletseverywhere.data.getDistanceMeters
 import com.kepper104.toiletseverywhere.data.getToiletOpenString
@@ -47,7 +43,6 @@ fun MapScreen(
         position = mainViewModel.mapState.cameraPosition
     }
 
-    HandleEvents(viewModel = mainViewModel, composeContext = LocalContext.current)
 
     Box(
         modifier = Modifier
@@ -55,15 +50,25 @@ fun MapScreen(
             .padding(mainViewModel.scaffoldPadding),
     ) {
 
-        if (mainViewModel.detailsState.currentDetailScreen == CurrentDetailsScreen.MAP){
+        if (mainViewModel.toiletViewDetailsState.currentDetailScreen == CurrentDetailsScreen.MAP){
             BackHandler (
-                onBack = {Log.d("BackLogger", "Handled back from MAP"); mainViewModel.leaveDetailsScreen()}
+                onBack = {Log.d("BackLogger", "Handled back from MAP"); mainViewModel.leaveToiletViewDetailsScreen()}
             )
             DetailsScreen()
             return
         }
 
+        if (mainViewModel.newToiletDetailsState.enabled){
+            BackHandler (
+                onBack = {Log.d("BackLogger", "Handled back from MAP"); mainViewModel.leaveNewToiletDetailsScreen()}
+            )
+            NewToiletDetailsScreen()
+            return
+        }
+
         Log.d(Tags.CompositionLogger.toString(), "Composing map!")
+
+
         GoogleMap(
             modifier = Modifier
                 .fillMaxSize(),
@@ -76,6 +81,11 @@ fun MapScreen(
                 }
             }
         ) {
+            Marker(
+                state = MarkerState(position = cameraPositionState.position.target),
+                visible = mainViewModel.mapState.addingToilet
+            )
+
             for(marker in mainViewModel.mapState.toiletMarkers){
                 Marker(
                     state = MarkerState(position = marker.position),
@@ -84,7 +94,6 @@ fun MapScreen(
                     snippet = "${getToiletOpenString(marker.toilet)}, ${getDistanceMeters(mainViewModel.mapState.userPosition, marker.position)}",
                     onInfoWindowClick = {mainViewModel.navigateToDetails(marker.toilet, CurrentDetailsScreen.MAP)}
                 )
-
             }
         }
     }

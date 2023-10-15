@@ -22,10 +22,11 @@ import com.kepper104.toiletseverywhere.domain.model.Toilet
 import com.kepper104.toiletseverywhere.domain.repository.Repository
 import com.kepper104.toiletseverywhere.presentation.ui.state.AuthState
 import com.kepper104.toiletseverywhere.presentation.ui.state.CurrentDetailsScreen
-import com.kepper104.toiletseverywhere.presentation.ui.state.DetailsState
+import com.kepper104.toiletseverywhere.presentation.ui.state.ToiletViewDetailsState
 import com.kepper104.toiletseverywhere.presentation.ui.state.LoggedInUserState
 import com.kepper104.toiletseverywhere.presentation.ui.state.MapState
 import com.kepper104.toiletseverywhere.presentation.ui.state.NavigationState
+import com.kepper104.toiletseverywhere.presentation.ui.state.NewToiletDetailsState
 import com.kepper104.toiletseverywhere.presentation.ui.state.ToiletsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -47,20 +48,19 @@ class MainViewModel @Inject constructor(
     var toiletsState by mutableStateOf(ToiletsState())
     var mapState by mutableStateOf(MapState())
     var authState by mutableStateOf(AuthState())
-    var detailsState by mutableStateOf(DetailsState())
+    var toiletViewDetailsState by mutableStateOf(ToiletViewDetailsState())
     var navigationState by mutableStateOf(NavigationState())
     var loggedInUserState by mutableStateOf(LoggedInUserState())
+    var newToiletDetailsState by mutableStateOf(NewToiletDetailsState())
 
     private val _eventFlow = MutableSharedFlow<ScreenEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
 
-
     private lateinit var locationClient: FusedLocationProviderClient
 
-
     lateinit var scaffoldPadding: PaddingValues
-//    lateinit var isLoggedInFlowChecker: State<Boolean?>
+
 
     init {
         collectLoginStatusFlow()
@@ -236,7 +236,7 @@ class MainViewModel @Inject constructor(
             val author = repository.retrieveUserById(toilet.authorId)
             val authorName = author?.displayName ?: "Error"
 
-            detailsState = detailsState.copy(
+            toiletViewDetailsState = toiletViewDetailsState.copy(
                 toilet = toilet,
                 currentDetailScreen = source,
                 authorName = authorName
@@ -245,12 +245,26 @@ class MainViewModel @Inject constructor(
     }
 
 
-    fun leaveDetailsScreen(){
+    fun leaveToiletViewDetailsScreen(){
         Log.d(Tags.MainViewModelTag.toString(), "Leaving details screen")
-        detailsState = detailsState.copy(toilet = null, currentDetailScreen = CurrentDetailsScreen.NONE)
-        Log.d(Tags.MainViewModelTag.toString(), "Left details: $detailsState")
+        toiletViewDetailsState = toiletViewDetailsState.copy(toilet = null, currentDetailScreen = CurrentDetailsScreen.NONE)
+        Log.d(Tags.MainViewModelTag.toString(), "Left details: $toiletViewDetailsState")
 
 
+    }
+
+    fun leaveNewToiletDetailsScreen(){
+        newToiletDetailsState = newToiletDetailsState.copy(
+            enabled = false
+        )
+    }
+
+    fun navigateToNewToiletDetailsScreen(){
+        Log.d(Tags.MainViewModelTag.toString(), mapState.newToiletMarkerState.toString())
+        newToiletDetailsState = newToiletDetailsState.copy(
+            enabled = true,
+            coordinates = mapState.newToiletMarkerState!!.position  // TODO NullPointerException here, do smth
+        )
     }
     private fun refreshToiletMarkers(){
         Log.d(Tags.MainViewModelTag.toString(), "Refreshing toilets")

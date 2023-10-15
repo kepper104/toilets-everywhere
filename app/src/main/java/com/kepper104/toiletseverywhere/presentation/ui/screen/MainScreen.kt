@@ -15,6 +15,7 @@ import com.kepper104.toiletseverywhere.data.ScreenEvent
 import com.kepper104.toiletseverywhere.data.Tags
 import com.kepper104.toiletseverywhere.presentation.MainViewModel
 import com.kepper104.toiletseverywhere.presentation.navigation.BottomNavigationBar
+import com.kepper104.toiletseverywhere.presentation.navigation.HandleEvents
 import com.kepper104.toiletseverywhere.presentation.navigation.NavScaffold
 import com.kepper104.toiletseverywhere.presentation.ui.screen.destinations.AuthScreenDestination
 import com.kepper104.toiletseverywhere.presentation.ui.screen.destinations.MainScreenDestination
@@ -38,7 +39,7 @@ fun MainScreen(
     var currentRoute: Route = AuthScreenDestination
 
     val isLoggedInFlowChecker = mainViewModel.isLoggedInFlow.collectAsState(initial = null)
-//    mainViewModel.addLoggedInChecker(isLoggedInFlowChecker)
+
 
     if (isLoggedInFlowChecker.value == false){
         currentRoute = AuthScreenDestination
@@ -80,24 +81,3 @@ fun MainScreen(
     }
 }
 
-@Composable
-fun HandleEvents(viewModel: MainViewModel, composeContext: Context) {
-    val loggerTag = "EventLogger"
-    LaunchedEffect(key1 = true) {
-        viewModel.eventFlow.collect { event ->
-            when (event) {
-                ScreenEvent.ToiletAddingDisabledToast -> {
-                    makeToast("Toilet adding disabled", composeContext, Toast.LENGTH_LONG)
-                }
-
-                ScreenEvent.ToiletAddingEnabledToast -> {
-                    makeToast("Long tap on map to add toilet", composeContext, Toast.LENGTH_LONG)
-                }
-
-                ScreenEvent.PlaceholderFunction -> {
-                    makeToast("This function is not implemented", composeContext, Toast.LENGTH_SHORT)
-                }
-            }
-        }
-    }
-}

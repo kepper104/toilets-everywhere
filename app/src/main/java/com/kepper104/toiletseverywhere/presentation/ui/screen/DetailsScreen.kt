@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.Accessible
 import androidx.compose.material.icons.filled.BabyChangingStation
 import androidx.compose.material.icons.filled.LocalParking
 import androidx.compose.material.icons.filled.StarRate
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,7 +40,7 @@ fun DetailsScreen() {
         modifier = Modifier
             .fillMaxSize()
     ){
-        val toiletInfo = mainViewModel.detailsState
+        val toiletInfo = mainViewModel.toiletViewDetailsState
         val toilet = toiletInfo.toilet!!
 
         Text(
