@@ -2,6 +2,7 @@ package com.kepper104.toiletseverywhere.presentation
 
 import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,6 +12,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MarkerState
 import com.kepper104.toiletseverywhere.data.AuthUiStatus
 import com.kepper104.toiletseverywhere.data.BottomBarDestination
 import com.kepper104.toiletseverywhere.data.LoginStatus
@@ -60,6 +62,7 @@ class MainViewModel @Inject constructor(
     private lateinit var locationClient: FusedLocationProviderClient
 
     lateinit var scaffoldPadding: PaddingValues
+//    lateinit var newToiletMarkerState: MarkerState
 
 
     init {
@@ -263,7 +266,7 @@ class MainViewModel @Inject constructor(
         Log.d(Tags.MainViewModelTag.toString(), mapState.newToiletMarkerState.toString())
         newToiletDetailsState = newToiletDetailsState.copy(
             enabled = true,
-            coordinates = mapState.newToiletMarkerState!!.position  // TODO NullPointerException here, do smth
+            coordinates = mapState.newToiletMarkerState!!.position
         )
     }
     private fun refreshToiletMarkers(){
@@ -425,5 +428,3 @@ class MainViewModel @Inject constructor(
     }
 
 }
-
-

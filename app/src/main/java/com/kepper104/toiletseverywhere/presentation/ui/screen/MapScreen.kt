@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,11 +18,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 import com.kepper104.toiletseverywhere.data.Tags
 import com.kepper104.toiletseverywhere.data.getDistanceMeters
 import com.kepper104.toiletseverywhere.data.getToiletOpenString
@@ -69,6 +72,13 @@ fun MapScreen(
         Log.d(Tags.CompositionLogger.toString(), "Composing map!")
 
 
+        val newToiletMarkerState = rememberMarkerState(position = LatLng(0.0, 0.0))
+
+        LaunchedEffect(key1 = true){
+            mainViewModel.mapState = mainViewModel.mapState.copy(newToiletMarkerState = newToiletMarkerState)
+            Log.d(Tags.CompositionLogger.toString(), "Written into mapState: $newToiletMarkerState, now is ${mainViewModel.mapState.newToiletMarkerState}")
+        }
+
         GoogleMap(
             modifier = Modifier
                 .fillMaxSize(),
@@ -81,10 +91,13 @@ fun MapScreen(
                 }
             }
         ) {
-            Marker(
-                state = MarkerState(position = cameraPositionState.position.target),
-                visible = mainViewModel.mapState.addingToilet
-            )
+            mainViewModel.mapState = mainViewModel.mapState.copy(newToiletMarkerState = MarkerState(position = cameraPositionState.position.target))
+            mainViewModel.mapState.newToiletMarkerState?.let {
+                Marker(
+                    state = it,
+                    visible = mainViewModel.mapState.addingToilet
+                )
+            }
 
             for(marker in mainViewModel.mapState.toiletMarkers){
                 Marker(

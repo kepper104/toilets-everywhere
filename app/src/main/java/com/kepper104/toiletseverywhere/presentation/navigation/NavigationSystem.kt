@@ -147,11 +147,26 @@ fun MapTopAppBar() {
                 }
             }
 
+            if(mainViewModel.newToiletDetailsState.enabled && mainViewModel.navigationState.currentDestination == BottomBarDestination.MapView){
+                IconButton(onClick = { mainViewModel.leaveNewToiletDetailsScreen() }) {
+                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Go Back")
+                }
+            }
+
+
         },
         actions = {
+            // Showing no icons when on toilet details view
             if (mainViewModel.toiletViewDetailsState.currentDetailScreen != CurrentDetailsScreen.NONE && destinationToDetailScreenMapping[mainViewModel.toiletViewDetailsState.currentDetailScreen] == mainViewModel.navigationState.currentDestination){
                 return@TopAppBar
             }
+
+            // Showing no icons when on new toilet add view
+            if (mainViewModel.newToiletDetailsState.enabled && mainViewModel.navigationState.currentDestination == BottomBarDestination.MapView){
+                return@TopAppBar
+            }
+
+            // Top Bar navigation buttons
             if (mainViewModel.navigationState.currentDestination == BottomBarDestination.MapView){
                 Log.d(Tags.CompositionLogger.toString(), "Showing buttons for MapView")
                 if (mainViewModel.mapState.addingToilet){
