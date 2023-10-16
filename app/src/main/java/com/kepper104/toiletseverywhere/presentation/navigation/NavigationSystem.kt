@@ -141,12 +141,14 @@ fun MapTopAppBar() {
         },
 
         navigationIcon = {
+            // Navigate back button for toilet details screen
             if(destinationToDetailScreenMapping[mainViewModel.toiletViewDetailsState.currentDetailScreen] == mainViewModel.navigationState.currentDestination && mainViewModel.navigationState.currentDestination != null){
                 IconButton(onClick = { mainViewModel.leaveToiletViewDetailsScreen() }) {
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Go Back")
                 }
             }
 
+            // Navigate back button for toilet creation screen
             if(mainViewModel.newToiletDetailsState.enabled && mainViewModel.navigationState.currentDestination == BottomBarDestination.MapView){
                 IconButton(onClick = { mainViewModel.leaveNewToiletDetailsScreen() }) {
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Go Back")
@@ -169,6 +171,8 @@ fun MapTopAppBar() {
             // Top Bar navigation buttons
             if (mainViewModel.navigationState.currentDestination == BottomBarDestination.MapView){
                 Log.d(Tags.CompositionLogger.toString(), "Showing buttons for MapView")
+
+                //
                 if (mainViewModel.mapState.addingToilet){
                     IconButton(onClick = { mainViewModel.navigateToNewToiletDetailsScreen(); mainViewModel.mapState = mainViewModel.mapState.copy(addingToilet = false) }) {
                         Icon(
@@ -178,6 +182,7 @@ fun MapTopAppBar() {
                     }
                 }
 
+                // Showing toilet creation button only for logged in users
                 if (mainViewModel.loggedInUserState.currentUserName != NOT_LOGGED_IN_STRING){
                     Log.d(Tags.CompositionLogger.toString(), "Showing Add Toilet button")
                     IconButton(onClick = {
