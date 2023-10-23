@@ -11,7 +11,7 @@ data class Toilet (
     val isPublic: Boolean = false,
     val disabledAccess: Boolean = false,
     val babyAccess: Boolean = false,
-    val parkingNearby: Boolean = true,
+    val parkingNearby: Boolean = false,
     val creationDate: LocalDate = LocalDate.of(2023, 1, 1),
     val openingTime: LocalTime = LocalTime.of(0, 0, 0),
     val closingTime: LocalTime = LocalTime.of(23, 59, 59),

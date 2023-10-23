@@ -103,6 +103,10 @@ dependencies {
     // Moshi
     implementation 'com.squareup.moshi:moshi-kotlin:1.13.0'
 
+    // For time
+    implementation "io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc"
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.6'
+
 }
 
 // Allow references to generated code

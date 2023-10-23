@@ -7,7 +7,7 @@ import java.time.LocalTime
 data class NewToiletDetailsState(
     val enabled: Boolean = false,
     val coordinates: LatLng = LatLng(0.0, 0.0),
-    val isPublic: Boolean = false,
+    val isPublic: Boolean = true,
     val name: String = "",
     val cost: Int = 0,
     val creationDate: LocalDate = LocalDate.of(2023, 1, 1),
