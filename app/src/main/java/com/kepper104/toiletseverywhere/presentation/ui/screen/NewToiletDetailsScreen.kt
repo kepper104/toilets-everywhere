@@ -3,45 +3,31 @@ package com.kepper104.toiletseverywhere.presentation.ui.screen
 
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kepper104.toiletseverywhere.presentation.MainViewModel
-import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 
@@ -50,9 +36,7 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 fun NewToiletDetailsScreen() {
     val mainViewModel: MainViewModel = hiltViewModel(LocalContext.current as ComponentActivity)
 
-    var timePickerOpen by remember{
-        mutableStateOf(false)
-    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -119,30 +103,26 @@ fun NewToiletDetailsScreen() {
 //            Text(text = "Pick opening time")
 //        }
 
-        Row {
-            TimePicker()
+        TimePickers(mainViewModel)
 
-            Spacer(modifier = Modifier.width(10.dp))
+//            Spacer(modifier = Modifier.width(10.dp))
 
-            TimePicker()
-        }
+
 
     }
 
 }
 
 @Composable
-fun TimePicker() {
+fun TimePickers(vm: MainViewModel) {
 
-    var pickedTime by remember {
-        mutableStateOf(LocalTime.NOON)
-    }
 
-    val formattedTime by remember {
+
+    val formattedOpeningTime by remember {
         derivedStateOf {
             DateTimeFormatter
                 .ofPattern("hh:mm")
-                .format(pickedTime)
+                .format(vm.newToiletDetailsState.openingTime)
         }
     }
 
@@ -151,8 +131,7 @@ fun TimePicker() {
     val context = LocalContext.current
 
     Column(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -160,9 +139,9 @@ fun TimePicker() {
         Button(onClick = {
             timeDialogState.show()
         }) {
-            Text(text = "Pick time")
+            Text(text = "Pick time $id")
         }
-        Text(text = formattedTime)
+        Text(text = formattedOpeningTime)
     }
 
     MaterialDialog(
@@ -181,7 +160,7 @@ fun TimePicker() {
         timepicker(
             initialTime = LocalTime.NOON,
             title = "Pick a time",
-            timeRange = LocalTime.MIDNIGHT..LocalTime.NOON
+            timeRange = LocalTime.MIDNIGHT..LocalTime.MAX
         ) {
             pickedTime = it
         }
