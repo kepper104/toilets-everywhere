@@ -76,6 +76,14 @@ class RepositoryImplementation (
         return null
     }
 
+    override suspend fun createToilet(toilet: Toilet) {
+        Log.d(Tags.RepositoryLogger.toString(), "Adding toilet $toilet")
+
+        val res = mainApi.createToilet(toilet)
+        Log.d(Tags.RepositoryLogger.tag, res.body()!!.toString())
+
+    }
+
     private suspend fun retrieveUsernameById(id: Int): String{
         val user = retrieveUserById(id)
 

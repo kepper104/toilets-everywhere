@@ -4,7 +4,7 @@ data class ApiToilet (
     val id_: Int = 0,
     val author_id_: Int = 0,
     val coordinates_: String = "(0, 0)",
-    val place_name_: String = "Unnamed Toilet",
+    val place_name_: String = "Public Toilet",
     val is_public_: Boolean = false,
     val disabled_access_: Boolean = false,
     val baby_access_: Boolean = false,

@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 
@@ -108,6 +109,28 @@ class MainViewModel @Inject constructor(
     }
 
 
+
+    fun createToilet(){
+        val toilet = Toilet(
+            id = 0,
+            authorId = repository.currentUser.id,
+            coordinates = Pair(newToiletDetailsState.coordinates.latitude.toFloat(), newToiletDetailsState.coordinates.longitude.toFloat()),
+            placeName = if (!newToiletDetailsState.isPublic) newToiletDetailsState.name else "Public Toilet",
+            isPublic = newToiletDetailsState.isPublic,
+            disabledAccess = newToiletDetailsState.disabledAccess,
+            babyAccess = newToiletDetailsState.babyAccess,
+            parkingNearby = newToiletDetailsState.parkingNearby,
+            creationDate = LocalDate.now(),
+            openingTime = newToiletDetailsState.openingTime,
+            closingTime = newToiletDetailsState.closingTime,
+            cost = newToiletDetailsState.cost,
+            authorName = repository.currentUser.displayName
+        )
+        viewModelScope.launch {
+            repository.createToilet(toilet)
+
+        }
+    }
 
     fun triggerEvent(event: ScreenEvent){
         viewModelScope.launch {
@@ -274,9 +297,7 @@ class MainViewModel @Inject constructor(
 
         mapState = mapState.copy(toiletMarkers = toiletsState.toiletList.map { toilet ->  toToiletMarker(toilet)})
     }
-    fun addToilet(){
-        Log.d(Tags.MainViewModelTag.toString(), "Adding toilets")
-    }
+
     fun navigateBackButton(){
         Log.d(Tags.MainViewModelTag.toString(), "Navigating back")
     }

@@ -4,10 +4,12 @@ package com.kepper104.toiletseverywhere.presentation.ui.screen
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
@@ -40,7 +42,6 @@ fun NewToiletDetailsScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-//            .padding(mainViewModel.scaffoldPadding)
 
     ) {
         Text(text = "Creating a new toilet", fontSize = 40.sp)
@@ -93,21 +94,19 @@ fun NewToiletDetailsScreen() {
             Text(text = "Visit price, leave 0 if free")
             TextField(
                 value = mainViewModel.newToiletDetailsState.cost.toString(),
-                onValueChange = {mainViewModel.newToiletDetailsState = mainViewModel.newToiletDetailsState.copy(cost = it.toInt())}
+                onValueChange = {mainViewModel.newToiletDetailsState = mainViewModel.newToiletDetailsState.copy(cost = it.toIntOrNull() ?: 0)}
             )
         }
 
         Text(text = "Working hours:")
 
-//        Button(onClick = { timePickerOpen = true }) {
-//            Text(text = "Pick opening time")
-//        }
-
         TimePickers(mainViewModel)
 
-//            Spacer(modifier = Modifier.width(10.dp))
-
-
+        Box(modifier = Modifier.fillMaxSize()){
+            Button(onClick = { mainViewModel.createToilet() }) {
+                Text(text = "Create a new toilet")
+            }
+        }
 
     }
 
@@ -115,9 +114,6 @@ fun NewToiletDetailsScreen() {
 
 @Composable
 fun TimePickers(vm: MainViewModel) {
-
-
-
     val formattedOpeningTime by remember {
         derivedStateOf {
             DateTimeFormatter
@@ -125,44 +121,91 @@ fun TimePickers(vm: MainViewModel) {
                 .format(vm.newToiletDetailsState.openingTime)
         }
     }
+    val formattedClosingTime by remember {
+        derivedStateOf {
+            DateTimeFormatter
+                .ofPattern("hh:mm")
+                .format(vm.newToiletDetailsState.closingTime)
+        }
+    }
 
-    val timeDialogState = rememberMaterialDialogState()
+    val openingTimeDialogState = rememberMaterialDialogState()
+    val closingTimeDialogState = rememberMaterialDialogState()
 
     val context = LocalContext.current
 
-    Column(
-        modifier = Modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-
-        Button(onClick = {
-            timeDialogState.show()
-        }) {
-            Text(text = "Pick time $id")
-        }
-        Text(text = formattedOpeningTime)
-    }
-
-    MaterialDialog(
-        dialogState = timeDialogState,
-        buttons = {
-            positiveButton(text = "Ok") {
-                Toast.makeText(
-                    context,
-                    "Clicked ok",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-            negativeButton(text = "Cancel")
-        }
-    ) {
-        timepicker(
-            initialTime = LocalTime.NOON,
-            title = "Pick a time",
-            timeRange = LocalTime.MIDNIGHT..LocalTime.MAX
+    Row {
+        Column(
+            modifier = Modifier,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            pickedTime = it
+
+            Button(onClick = {
+                openingTimeDialogState.show()
+            }) {
+                Text(text = "Pick opening time")
+            }
+            Text(text = formattedOpeningTime)
+        }
+
+        MaterialDialog(
+            dialogState = openingTimeDialogState,
+            buttons = {
+                positiveButton(text = "Ok") {
+                    Toast.makeText(
+                        context,
+                        "Clicked ok",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                negativeButton(text = "Cancel")
+            }
+        ) {
+            timepicker(
+                initialTime = LocalTime.of(6, 0),
+                title = "Pick opening time",
+                timeRange = LocalTime.MIDNIGHT..LocalTime.MAX
+            ) {
+                vm.newToiletDetailsState = vm.newToiletDetailsState.copy(openingTime = it)
+            }
+        }
+        Column(
+            modifier = Modifier,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+
+            Button(onClick = {
+                closingTimeDialogState.show()
+            }) {
+                Text(text = "Pick closing time")
+            }
+            Text(text = formattedClosingTime)
+        }
+
+        MaterialDialog(
+            dialogState = closingTimeDialogState,
+            buttons = {
+                positiveButton(text = "Ok") {
+                    Toast.makeText(
+                        context,
+                        "Clicked ok",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                negativeButton(text = "Cancel")
+            }
+        ) {
+            timepicker(
+                initialTime = LocalTime.of(22, 0),
+                title = "Pick closing time",
+                timeRange = LocalTime.MIDNIGHT..LocalTime.MAX
+            ) {
+                vm.newToiletDetailsState = vm.newToiletDetailsState.copy(closingTime = it)
+
+            }
         }
     }
+
 }

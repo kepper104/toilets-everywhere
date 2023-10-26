@@ -2,6 +2,7 @@ package com.kepper104.toiletseverywhere.data.api
 
 import com.kepper104.toiletseverywhere.domain.model.ApiToilet
 import com.kepper104.toiletseverywhere.domain.model.ApiUser
+import com.kepper104.toiletseverywhere.domain.model.Toilet
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -15,6 +16,9 @@ interface MainApi {
 
     @GET("/toilets/{id}")
     suspend fun getToiletById(@Path("id") toiletId: Int): Response<ApiToilet>
+
+    @POST("/toilets")
+    suspend fun createToilet(@Body newToiletData: Toilet): Response<MessageResponse>
 
     @POST("/users/login")
     suspend fun loginUser(@Body loginData: LoginData): Response<LoginResponse>
@@ -54,6 +58,8 @@ data class LoginCheckResponse(
 data class MessageResponse(
     val Message: String
 )
+
+
 
 
 // TODO change json variable names to kotlin conventions and add @JSON stuff for incoming json names

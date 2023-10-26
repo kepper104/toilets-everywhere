@@ -7,7 +7,7 @@ data class Toilet (
     val id: Int = 0,
     val authorId: Int = 0,
     val coordinates: Pair<Float, Float> = Pair(0F, 0F),
-    val placeName: String = "Unnamed Toilet",
+    val placeName: String = "Public Toilet",
     val isPublic: Boolean = false,
     val disabledAccess: Boolean = false,
     val babyAccess: Boolean = false,
