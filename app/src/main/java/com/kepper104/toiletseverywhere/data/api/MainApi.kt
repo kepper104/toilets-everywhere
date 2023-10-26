@@ -18,7 +18,7 @@ interface MainApi {
     suspend fun getToiletById(@Path("id") toiletId: Int): Response<ApiToilet>
 
     @POST("/toilets")
-    suspend fun createToilet(@Body newToiletData: Toilet): Response<MessageResponse>
+    suspend fun createToilet(@Body newToiletData: ApiToilet): Response<MessageResponse>
 
     @POST("/users/login")
     suspend fun loginUser(@Body loginData: LoginData): Response<LoginResponse>
@@ -58,6 +58,8 @@ data class LoginCheckResponse(
 data class MessageResponse(
     val Message: String
 )
+
+
 
 
 

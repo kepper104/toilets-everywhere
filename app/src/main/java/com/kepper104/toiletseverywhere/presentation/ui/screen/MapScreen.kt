@@ -91,7 +91,12 @@ fun MapScreen(
                 }
             }
         ) {
-            mainViewModel.mapState = mainViewModel.mapState.copy(newToiletMarkerState = MarkerState(position = cameraPositionState.position.target))
+            LaunchedEffect(key1 = cameraPositionState.position.target){
+                if (mainViewModel.mapState.addingToilet){
+                    mainViewModel.mapState = mainViewModel.mapState.copy(newToiletMarkerState = MarkerState(position = cameraPositionState.position.target))
+                }
+
+            }
             mainViewModel.mapState.newToiletMarkerState?.let {
                 Marker(
                     state = it,
@@ -102,7 +107,7 @@ fun MapScreen(
             for(marker in mainViewModel.mapState.toiletMarkers){
                 Marker(
                     state = MarkerState(position = marker.position),
-                    title = "Public toilet",
+                    title = if (marker.isPublic) "Public toilet" else marker.toilet.placeName,
                     icon = getToiletIcon(marker.isPublic),
                     snippet = "${getToiletOpenString(marker.toilet)}, ${getDistanceMeters(mainViewModel.mapState.userPosition, marker.position)}",
                     onInfoWindowClick = {mainViewModel.navigateToDetails(marker.toilet, CurrentDetailsScreen.MAP)}

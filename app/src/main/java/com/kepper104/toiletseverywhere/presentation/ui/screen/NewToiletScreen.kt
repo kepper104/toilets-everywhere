@@ -38,7 +38,6 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 fun NewToiletDetailsScreen() {
     val mainViewModel: MainViewModel = hiltViewModel(LocalContext.current as ComponentActivity)
 
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -117,14 +116,14 @@ fun TimePickers(vm: MainViewModel) {
     val formattedOpeningTime by remember {
         derivedStateOf {
             DateTimeFormatter
-                .ofPattern("hh:mm")
+                .ofPattern("HH:mm")
                 .format(vm.newToiletDetailsState.openingTime)
         }
     }
     val formattedClosingTime by remember {
         derivedStateOf {
             DateTimeFormatter
-                .ofPattern("hh:mm")
+                .ofPattern("HH:mm")
                 .format(vm.newToiletDetailsState.closingTime)
         }
     }
@@ -165,7 +164,8 @@ fun TimePickers(vm: MainViewModel) {
             timepicker(
                 initialTime = LocalTime.of(6, 0),
                 title = "Pick opening time",
-                timeRange = LocalTime.MIDNIGHT..LocalTime.MAX
+                timeRange = LocalTime.MIDNIGHT..LocalTime.MAX,
+                is24HourClock = true
             ) {
                 vm.newToiletDetailsState = vm.newToiletDetailsState.copy(openingTime = it)
             }
@@ -200,7 +200,8 @@ fun TimePickers(vm: MainViewModel) {
             timepicker(
                 initialTime = LocalTime.of(22, 0),
                 title = "Pick closing time",
-                timeRange = LocalTime.MIDNIGHT..LocalTime.MAX
+                timeRange = LocalTime.MIDNIGHT..LocalTime.MAX,
+                is24HourClock = true
             ) {
                 vm.newToiletDetailsState = vm.newToiletDetailsState.copy(closingTime = it)
 

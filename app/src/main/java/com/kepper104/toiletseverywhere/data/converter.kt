@@ -46,6 +46,26 @@ fun fromApiToilet(apiToilet: ApiToilet): Toilet{
     )
 }
 
+fun toApiToilet(toilet: Toilet): ApiToilet{
+    val openingTime = toilet.openingTime.format(timeFormatter1)
+    val closingTime = toilet.closingTime.format(timeFormatter1)
+
+    return ApiToilet(
+        id_ = toilet.id,
+        author_id_ = toilet.authorId,
+        coordinates_ = "(${toilet.coordinates.first}, ${toilet.coordinates.second})",
+        place_name_ = toilet.placeName,
+        is_public_ = toilet.isPublic,
+        disabled_access_ = toilet.disabledAccess,
+        baby_access_ = toilet.babyAccess,
+        parking_nearby_ = toilet.parkingNearby,
+        creation_date_ = toilet.creationDate.toString(),
+        opening_time_ = openingTime,
+        closing_time_ = closingTime,
+        cost_ = toilet.cost,
+    )
+}
+
 fun toToiletMarker(toilet: Toilet): ToiletMarker{
     return ToiletMarker(
         id = toilet.id,

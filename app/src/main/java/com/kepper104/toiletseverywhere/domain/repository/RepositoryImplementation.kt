@@ -16,6 +16,7 @@ import com.kepper104.toiletseverywhere.data.api.MainApi
 import com.kepper104.toiletseverywhere.data.api.RegisterData
 import com.kepper104.toiletseverywhere.data.fromApiToilet
 import com.kepper104.toiletseverywhere.data.fromApiUser
+import com.kepper104.toiletseverywhere.data.toApiToilet
 import com.kepper104.toiletseverywhere.domain.model.Toilet
 import com.kepper104.toiletseverywhere.domain.model.LocalUser
 import com.kepper104.toiletseverywhere.domain.model.User
@@ -79,8 +80,11 @@ class RepositoryImplementation (
     override suspend fun createToilet(toilet: Toilet) {
         Log.d(Tags.RepositoryLogger.toString(), "Adding toilet $toilet")
 
-        val res = mainApi.createToilet(toilet)
-        Log.d(Tags.RepositoryLogger.tag, res.body()!!.toString())
+        val res = mainApi.createToilet(toApiToilet(toilet))
+        Log.d(Tags.RepositoryLogger.tag, res.body().toString())
+
+
+
 
     }
 

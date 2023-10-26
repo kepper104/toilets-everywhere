@@ -119,6 +119,7 @@ fun NavScaffold(
 fun MapTopAppBar() {
     val mainViewModel: MainViewModel = hiltViewModel(LocalContext.current as ComponentActivity)
 
+
     TopAppBar(
         title = {
             when (mainViewModel.navigationState.currentDestination) {
@@ -158,6 +159,7 @@ fun MapTopAppBar() {
 
         },
         actions = {
+
             // Showing no icons when on toilet details view
             if (mainViewModel.toiletViewDetailsState.currentDetailScreen != CurrentDetailsScreen.NONE && destinationToDetailScreenMapping[mainViewModel.toiletViewDetailsState.currentDetailScreen] == mainViewModel.navigationState.currentDestination){
                 return@TopAppBar

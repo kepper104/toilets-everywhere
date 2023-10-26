@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalTime
 import javax.inject.Inject
 
 
@@ -63,7 +64,6 @@ class MainViewModel @Inject constructor(
     private lateinit var locationClient: FusedLocationProviderClient
 
     lateinit var scaffoldPadding: PaddingValues
-//    lateinit var newToiletMarkerState: MarkerState
 
 
     init {
@@ -128,7 +128,11 @@ class MainViewModel @Inject constructor(
         )
         viewModelScope.launch {
             repository.createToilet(toilet)
-
+            newToiletDetailsState = newToiletDetailsState.copy(enabled = false, name = "", isPublic = true, cost = 0, openingTime = LocalTime.of(6, 0), closingTime = LocalTime.of(23, 0), disabledAccess = false, babyAccess = false, parkingNearby = false)
+            delay(1000)
+            getLatestToilets()
+            delay(1000)
+            refreshToiletMarkers()
         }
     }
 
